@@ -56,12 +56,15 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/habit_db
       SPRING_DATASOURCE_USERNAME: habit_user
       SPRING_DATASOURCE_PASSWORD: habit_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_GROUP_ID: habit-api-group
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8080:8080"
 
