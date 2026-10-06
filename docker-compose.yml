@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: habit_user
       POSTGRES_PASSWORD: habit_password
     ports:
-      - "5432:5432"
+      - "54320:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
