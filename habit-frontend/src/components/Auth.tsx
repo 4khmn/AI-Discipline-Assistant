@@ -34,7 +34,9 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         onLogin(resUser, token);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Произошла ошибка авторизации');
+      console.log('Auth error:', err);
+      const errorMessage = err.response?.data?.message || err.response?.data || err.message || 'Произошла ошибка авторизации';
+      setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm break-words">
             {error}
           </div>
         )}
