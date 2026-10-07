@@ -90,7 +90,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: habit_password
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_CONSUMER_GROUP_ID: ai-analytics-group
-      SPRING_AI_OPENAI_API_KEY: ${OPENAI_API_KEY}
+      SPRING_AI_OPENAI_API_KEY: ${GEMINI_API_KEY}
+      SPRING_AI_OPENAI_BASE_URL: https://generativelanguage.googleapis.com/v1beta/openai
+      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gemini-3.5-flash-lite
     ports:
       - "8081:8081"
 

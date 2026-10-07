@@ -1,5 +1,6 @@
 package akhm.project.ai.listener;
 
+import akhm.project.ai.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -14,14 +15,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HabitEventListener {
 
-    /**
-     * Основной метод-слушатель сообщений из Kafka.
-     *
-     * @param record полный объект записи Kafka с метаданными
-     * @param payload содержимое сообщения (JSON или String)
-     * @param partition номер партиции, откуда пришло сообщение
-     * @param offset смещение (offset) сообщения в партиции
-     */
+    private final AiAnalysisService aiAnalysisService;
+
     @KafkaListener(
             topics = "${app.kafka.topics.habit-events:habit-events}",
             groupId = "${spring.kafka.consumer.group-id:ai-analytics-group}"
@@ -42,20 +37,22 @@ public class HabitEventListener {
         log.info("==============================================================");
 
         try {
-            // Здесь вызывается бизнес-логика обработки события
             processEvent(record.key(), payload);
 
             log.info("Successfully processed message with key: {}", record.key());
         } catch (Exception e) {
             log.error("Error processing Kafka message from topic {} at offset {}: {}",
                     record.topic(), offset, e.getMessage(), e);
-            // При необходимости бросаем исключение дальше для срабатывания Retry / Dead Letter Queue (DLQ)
             throw e;
         }
     }
 
     private void processEvent(String key, String payload) {
-        // Логика обработки события (например, отправка в Spring AI или сохранение аналитики)
-        log.debug("Processing payload for key: {}", key);
+        String aiAdvice = aiAnalysisService.analyzeHabitData(payload);
+
+        log.info("=================== GEMINI AI ANALYSIS ===================");
+        log.info("Ключ отчёта: {}", key);
+        log.info("Рекомендация ИИ:\n{}", aiAdvice);
+        log.info("==========================================================");
     }
 }
