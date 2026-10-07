@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
 
     private final KafkaTemplate<String, HabitReportMessage> kafkaTemplate;
-    private static final String HABIT_REPORT_TOPIC = "habit-reports";
+    private static final String HABIT_REPORT_TOPIC = "habit-events";
 
     public void sendHabitReport(HabitReportMessage message) {
         kafkaTemplate.send(HABIT_REPORT_TOPIC, message);
