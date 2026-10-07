@@ -50,6 +50,16 @@ services:
       timeout: 10s
       retries: 5
 
+  habit-frontend:
+    build:
+      context: ./habit-frontend
+      dockerfile: Dockerfile
+    container_name: habit-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - habit-api-service
+
   habit-api-service:
     build:
       context: .
