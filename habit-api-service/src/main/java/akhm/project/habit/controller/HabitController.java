@@ -1,7 +1,6 @@
 package akhm.project.habit.controller;
 
 import akhm.project.habit.dto.HabitReportRequest;
-import akhm.project.habit.entity.HabitRecommendation;
 import akhm.project.habit.service.HabitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -33,14 +31,5 @@ public class HabitController {
                 "status", "ACCEPTED",
                 "message", "Отчет принят и отправлен на AI-анализ"
         ));
-    }
-
-    @GetMapping("/recommendations")
-    public ResponseEntity<List<HabitRecommendation>> getRecommendations(Authentication authentication) {
-        String username = authentication != null ? authentication.getName() : "unknown";
-        log.info("Received request to fetch AI recommendations for user: {}", username);
-        List<HabitRecommendation> recommendations = habitService.getUserRecommendations(authentication);
-        log.info("Successfully fetched {} AI recommendations for user: {}", recommendations.size(), username);
-        return ResponseEntity.ok(recommendations);
     }
 }
