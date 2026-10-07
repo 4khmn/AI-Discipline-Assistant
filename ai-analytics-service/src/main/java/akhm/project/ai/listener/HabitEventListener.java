@@ -1,5 +1,7 @@
 package akhm.project.ai.listener;
 
+import akhm.project.ai.entity.HabitRecommendation;
+import akhm.project.ai.repository.HabitRecommendationRepository;
 import akhm.project.ai.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,12 +12,15 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class HabitEventListener {
 
     private final AiAnalysisService aiAnalysisService;
+    private final HabitRecommendationRepository recommendationRepository;
 
     @KafkaListener(
             topics = "${app.kafka.topics.habit-events:habit-events}",
@@ -54,5 +59,14 @@ public class HabitEventListener {
         log.info("Ключ отчёта: {}", key);
         log.info("Рекомендация ИИ:\n{}", aiAdvice);
         log.info("==========================================================");
+
+        HabitRecommendation recommendation = HabitRecommendation.builder()
+                .reportText(payload)
+                .recommendation(aiAdvice)
+                .createdAt(Instant.now())
+                .build();
+
+        recommendationRepository.save(recommendation);
+        log.info("Сохранена рекомендация ИИ в базу данных для ключа: {}", key);
     }
 }
