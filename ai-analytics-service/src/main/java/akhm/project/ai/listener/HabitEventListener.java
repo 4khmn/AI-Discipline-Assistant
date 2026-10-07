@@ -33,18 +33,11 @@ public class HabitEventListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
-        log.info("=================== KAFKA MESSAGE RECEIVED ===================");
-        log.info("Topic: {}", record.topic());
-        log.info("Partition: {}", partition);
-        log.info("Offset: {}", offset);
-        log.info("Key: {}", record.key());
-        log.info("Payload: {}", message);
-        log.info("Timestamp: {}", record.timestamp());
-        log.info("==============================================================");
+        log.info("Received Kafka message from topic: {}, partition: {}, offset: {}, key: {}", 
+                record.topic(), partition, offset, record.key());
 
         try {
             processEvent(record.key(), message);
-
             log.info("Successfully processed message with key: {}", record.key());
         } catch (Exception e) {
             log.error("Error processing Kafka message from topic {} at offset {}: {}",
@@ -58,11 +51,7 @@ public class HabitEventListener {
         String aiAdvice = aiAnalysisService.analyzeHabitData(message.getReportText());
         long durationMs = System.currentTimeMillis() - startTime;
 
-        log.info("=================== GEMINI AI ANALYSIS ===================");
-        log.info("Ключ отчёта: {}", key);
-        log.info("Время ответа ИИ: {} мс", durationMs);
-        log.info("Рекомендация ИИ:\n{}", aiAdvice);
-        log.info("==========================================================");
+        log.info("AI analysis completed for report key: {}, duration: {} ms", key, durationMs);
 
         HabitRecommendation recommendation = HabitRecommendation.builder()
                 .userId(message.getUserId() != null ? message.getUserId() : 1L)
@@ -73,6 +62,6 @@ public class HabitEventListener {
                 .build();
 
         recommendationRepository.save(recommendation);
-        log.info("Сохранена рекомендация ИИ в базу данных для пользователя: {}", message.getUserId());
+        log.info("Saved AI recommendation to database for user id: {}", message.getUserId());
     }
 }
