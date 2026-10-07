@@ -23,6 +23,11 @@ public class HabitRecommendation {
     @Column(name = "habit_id")
     private Long habitId;
 
+    // Исходный текст отчёта / промпт пользователя
+    @Column(name = "user_input", nullable = false, columnDefinition = "TEXT")
+    private String userInput;
+
+    // Сгенерированный ответ ИИ
     @Column(name = "recommendation_text", nullable = false, columnDefinition = "TEXT")
     private String recommendationText;
 
