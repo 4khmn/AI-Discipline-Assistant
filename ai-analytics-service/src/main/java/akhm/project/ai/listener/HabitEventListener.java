@@ -1,5 +1,6 @@
 package akhm.project.ai.listener;
 
+import akhm.project.ai.dto.HabitReportMessage;
 import akhm.project.ai.entity.HabitRecommendation;
 import akhm.project.ai.repository.HabitRecommendationRepository;
 import akhm.project.ai.service.AiAnalysisService;
@@ -27,8 +28,8 @@ public class HabitEventListener {
             groupId = "${spring.kafka.consumer.group-id:ai-analytics-group}"
     )
     public void handleHabitEvent(
-            ConsumerRecord<String, String> record,
-            @Payload String payload,
+            ConsumerRecord<String, HabitReportMessage> record,
+            @Payload HabitReportMessage message,
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
@@ -37,12 +38,12 @@ public class HabitEventListener {
         log.info("Partition: {}", partition);
         log.info("Offset: {}", offset);
         log.info("Key: {}", record.key());
-        log.info("Payload: {}", payload);
+        log.info("Payload: {}", message);
         log.info("Timestamp: {}", record.timestamp());
         log.info("==============================================================");
 
         try {
-            processEvent(record.key(), payload);
+            processEvent(record.key(), message);
 
             log.info("Successfully processed message with key: {}", record.key());
         } catch (Exception e) {
@@ -52,9 +53,9 @@ public class HabitEventListener {
         }
     }
 
-    private void processEvent(String key, String payload) {
+    private void processEvent(String key, HabitReportMessage message) {
         long startTime = System.currentTimeMillis();
-        String aiAdvice = aiAnalysisService.analyzeHabitData(payload);
+        String aiAdvice = aiAnalysisService.analyzeHabitData(message.getReportText());
         long durationMs = System.currentTimeMillis() - startTime;
 
         log.info("=================== GEMINI AI ANALYSIS ===================");
@@ -64,14 +65,14 @@ public class HabitEventListener {
         log.info("==========================================================");
 
         HabitRecommendation recommendation = HabitRecommendation.builder()
-                .userId(1L) // При необходимости можно извлечь реальный userId из payload или заголовков
-                .userInput(payload)
+                .userId(message.getUserId() != null ? message.getUserId() : 1L)
+                .userInput(message.getReportText())
                 .recommendationText(aiAdvice)
                 .aiResponseDurationMs(durationMs)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         recommendationRepository.save(recommendation);
-        log.info("Сохранена рекомендация ИИ в базу данных для ключа: {}", key);
+        log.info("Сохранена рекомендация ИИ в базу данных для пользователя: {}", message.getUserId());
     }
 }
