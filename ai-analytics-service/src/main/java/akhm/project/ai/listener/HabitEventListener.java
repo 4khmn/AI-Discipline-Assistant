@@ -12,7 +12,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Component
@@ -61,9 +61,9 @@ public class HabitEventListener {
         log.info("==========================================================");
 
         HabitRecommendation recommendation = HabitRecommendation.builder()
-                .reportText(payload)
-                .recommendation(aiAdvice)
-                .createdAt(Instant.now())
+                .userId(1L) // Здесь можно будет заменять на реальный ID из распарсенного payload, если потребуется
+                .recommendationText(aiAdvice)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         recommendationRepository.save(recommendation);
