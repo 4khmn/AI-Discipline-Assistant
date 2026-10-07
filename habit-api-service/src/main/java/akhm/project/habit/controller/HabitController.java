@@ -1,7 +1,6 @@
 package akhm.project.habit.controller;
 
 import akhm.project.habit.dto.HabitReportRequest;
-import akhm.project.habit.dto.HabitReportResponse;
 import akhm.project.habit.service.HabitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
