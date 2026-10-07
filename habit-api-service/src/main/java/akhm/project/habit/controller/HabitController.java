@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/habits")
@@ -19,13 +21,16 @@ public class HabitController {
     private final HabitService habitService;
 
     @PostMapping("/report")
-    public ResponseEntity<HabitReportResponse> submitReport(
+    public ResponseEntity<Map<String, String>> submitReport(
             @Valid @RequestBody HabitReportRequest request,
             Authentication authentication) {
         String username = authentication != null ? authentication.getName() : "unknown";
         log.info("Received habit report submission for user: {}", username);
-        HabitReportResponse response = habitService.submitHabitReport(request, authentication);
+        habitService.submitHabitReport(request, authentication);
         log.info("Successfully submitted habit report for user: {}", username);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.accepted().body(Map.of(
+                "status", "ACCEPTED",
+                "message", "Отчет принят и отправлен на AI-анализ"
+        ));
     }
 }

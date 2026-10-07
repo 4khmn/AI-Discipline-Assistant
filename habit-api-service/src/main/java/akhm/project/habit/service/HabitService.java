@@ -18,7 +18,7 @@ public class HabitService {
     private final KafkaProducerService kafkaProducerService;
     private final UserRepository userRepository;
 
-    public HabitReportResponse submitHabitReport(HabitReportRequest request, Authentication authentication) {
+    public void submitHabitReport(HabitReportRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
 
         HabitReportMessage message = new HabitReportMessage(
@@ -28,7 +28,5 @@ public class HabitService {
         );
 
         kafkaProducerService.sendHabitReport(message);
-
-        return new HabitReportResponse("ACCEPTED", "Отчет принят и отправлен на AI-анализ");
     }
 }
