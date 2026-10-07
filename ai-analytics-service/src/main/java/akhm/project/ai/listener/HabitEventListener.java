@@ -53,16 +53,21 @@ public class HabitEventListener {
     }
 
     private void processEvent(String key, String payload) {
+        long startTime = System.currentTimeMillis();
         String aiAdvice = aiAnalysisService.analyzeHabitData(payload);
+        long durationMs = System.currentTimeMillis() - startTime;
 
         log.info("=================== GEMINI AI ANALYSIS ===================");
         log.info("Ключ отчёта: {}", key);
+        log.info("Время ответа ИИ: {} мс", durationMs);
         log.info("Рекомендация ИИ:\n{}", aiAdvice);
         log.info("==========================================================");
 
         HabitRecommendation recommendation = HabitRecommendation.builder()
-                .userId(1L) // Здесь можно будет заменять на реальный ID из распарсенного payload, если потребуется
+                .userId(1L) // При необходимости можно извлечь реальный userId из payload или заголовков
+                .userInput(payload)
                 .recommendationText(aiAdvice)
+                .aiResponseDurationMs(durationMs)
                 .createdAt(LocalDateTime.now())
                 .build();
 
