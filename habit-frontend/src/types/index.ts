@@ -4,6 +4,7 @@ export interface HabitRecommendation {
   habitId?: number;
   userInput: string;
   recommendationText: string;
+  hasError?: boolean;
   aiResponseDurationMs?: number;
   createdAt: string;
 }
