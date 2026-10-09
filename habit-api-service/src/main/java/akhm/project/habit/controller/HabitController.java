@@ -5,6 +5,7 @@ import akhm.project.habit.dto.DisciplineReportRequest;
 import akhm.project.habit.dto.HabitRecommendationResponse;
 import akhm.project.habit.dto.HabitReportRequest;
 import akhm.project.habit.entity.User;
+import akhm.project.habit.entity.UserDailyDiscipline;
 import akhm.project.habit.service.HabitService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,14 @@ public class HabitController {
                 "status", "SUCCESS",
                 "message", "Дисциплина успешно сохранена"
         ));
+    }
+
+    @GetMapping("/disciplines")
+    public ResponseEntity<List<UserDailyDiscipline>> getDisciplines(Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "unknown";
+        log.info("Received request to fetch disciplines history for user: {}", username);
+        List<UserDailyDiscipline> history = habitService.getDisciplinesHistory(authentication);
+        return ResponseEntity.ok(history);
     }
 
     @GetMapping("/recommendations")

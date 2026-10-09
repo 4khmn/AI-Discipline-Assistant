@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DisciplineKey } from '../types';
+import { DisciplineKey, UserDailyDiscipline } from '../types';
 
 const api = axios.create({
   baseURL: 'http://localhost:8080',
@@ -18,8 +18,13 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-export const saveDisciplines = async (disciplines: Record<DisciplineKey, boolean>) => {
-  const response = await api.post('/api/habits/disciplines', { disciplines });
+export const saveDisciplines = async (date: string, disciplines: Record<DisciplineKey, boolean>) => {
+  const response = await api.post('/api/habits/disciplines', { date, disciplines });
+  return response.data;
+};
+
+export const fetchDisciplines = async (): Promise<UserDailyDiscipline[]> => {
+  const response = await api.get('/api/habits/disciplines');
   return response.data;
 };
 

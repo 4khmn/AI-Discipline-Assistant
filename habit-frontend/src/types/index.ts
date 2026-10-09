@@ -30,3 +30,17 @@ export const DISCIPLINE_LABELS: Record<DisciplineKey, string> = {
   OUTDOOR_WALK: 'Прогулка на воздухе',
   LEETCODE: 'Литкод',
 };
+
+export interface UserDailyDiscipline {
+  id: number;
+  userId: number;
+  disciplineDate: string;
+  water2l: boolean;
+  workout: boolean;
+  running: boolean;
+  steps10k: boolean;
+  outdoorWalk: boolean;
+  leetcode: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
