@@ -48,15 +48,16 @@ public class HabitEventListener {
 
     private void processEvent(String key, HabitReportMessage message) {
         long startTime = System.currentTimeMillis();
-        String aiAdvice = aiAnalysisService.analyzeHabitData(message.getReportText());
+        AiAnalysisService.AiAnalysisResult result = aiAnalysisService.analyzeHabitData(message.getReportText());
         long durationMs = System.currentTimeMillis() - startTime;
 
-        log.info("AI analysis completed for report key: {}, duration: {} ms", key, durationMs);
+        log.info("AI analysis completed for report key: {}, duration: {} ms, hasError: {}", key, durationMs, result.hasError());
 
         HabitRecommendation recommendation = HabitRecommendation.builder()
                 .userId(message.getUserId() != null ? message.getUserId() : 1L)
                 .userInput(message.getReportText())
-                .recommendationText(aiAdvice)
+                .recommendationText(result.text())
+                .hasError(result.hasError())
                 .aiResponseDurationMs(durationMs)
                 .createdAt(LocalDateTime.now())
                 .build();

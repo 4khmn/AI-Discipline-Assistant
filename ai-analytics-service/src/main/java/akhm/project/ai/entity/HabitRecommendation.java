@@ -31,6 +31,10 @@ public class HabitRecommendation {
     @Column(name = "recommendation_text", nullable = false, columnDefinition = "TEXT")
     private String recommendationText;
 
+    @Builder.Default
+    @Column(name = "has_error", nullable = false)
+    private boolean hasError = false;
+
     // Время ожидания ответа от ИИ в миллисекундах
     @Column(name = "ai_response_duration_ms")
     private Long aiResponseDurationMs;

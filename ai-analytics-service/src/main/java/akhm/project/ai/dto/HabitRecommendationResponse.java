@@ -17,6 +17,7 @@ public class HabitRecommendationResponse {
     private Long habitId;
     private String userInput;
     private String recommendationText;
+    private boolean hasError;
     private Long aiResponseDurationMs;
     private LocalDateTime createdAt;
 }

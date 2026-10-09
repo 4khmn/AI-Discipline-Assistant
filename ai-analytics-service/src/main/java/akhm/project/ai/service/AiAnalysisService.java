@@ -22,7 +22,9 @@ public class AiAnalysisService {
     private final ChatModel chatModel;
     private final HabitRecommendationRepository recommendationRepository;
 
-    public String analyzeHabitData(String habitPayload) {
+    public record AiAnalysisResult(String text, boolean hasError) {}
+
+    public AiAnalysisResult analyzeHabitData(String habitPayload) {
         log.info("Отправка данных трекинга в Gemini через Spring AI...");
 
         String template = """
@@ -50,10 +52,10 @@ public class AiAnalysisService {
         try {
             String response = chatModel.call(prompt).getResult().getOutput().getText();
             log.info("Успешно получен ответ от Gemini!");
-            return response;
+            return new AiAnalysisResult(response, false);
         } catch (Exception e) {
             log.error("Ошибка при запросе к Gemini API: {}", e.getMessage(), e);
-            return "Не удалось получить рекомендацию ИИ: " + e.getMessage();
+            return new AiAnalysisResult("В данный момент ИИ-коуч временно недоступен или отклонил запрос. Пожалуйста, попробуйте позже.", true);
         }
     }
 
@@ -68,6 +70,7 @@ public class AiAnalysisService {
                         .habitId(rec.getHabitId())
                         .userInput(rec.getUserInput())
                         .recommendationText(rec.getRecommendationText())
+                        .hasError(rec.isHasError())
                         .aiResponseDurationMs(rec.getAiResponseDurationMs())
                         .createdAt(rec.getCreatedAt())
                         .build())
