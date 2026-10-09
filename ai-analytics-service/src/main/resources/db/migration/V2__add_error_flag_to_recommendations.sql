@@ -1,10 +1,11 @@
-ALTER TABLE habit_recommendations 
-    ADD COLUMN IF NOT EXISTS has_error BOOLEAN;
-
-UPDATE habit_recommendations 
-    SET has_error = FALSE 
-    WHERE has_error IS NULL;
-
-ALTER TABLE habit_recommendations 
-    ALTER COLUMN has_error SET NOT NULL,
-    ALTER COLUMN has_error SET DEFAULT FALSE;
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM information_schema.columns 
+        WHERE table_name = 'habit_recommendations' 
+        AND column_name = 'has_error'
+    ) THEN
+        ALTER TABLE habit_recommendations ADD COLUMN has_error BOOLEAN NOT NULL DEFAULT FALSE;
+    END IF;
+END $$;
