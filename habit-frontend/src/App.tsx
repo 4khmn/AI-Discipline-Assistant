@@ -7,16 +7,25 @@ import { Insights } from './components/Insights';
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [username, setUsername] = useState<string>(localStorage.getItem('username') || '');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'insights'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'insights'>(() => {
+    return (localStorage.getItem('activeTab') as 'dashboard' | 'insights') || 'dashboard';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
 
   const handleLogin = (user: string, jwt: string) => {
     setToken(jwt);
     setUsername(user);
+    localStorage.setItem('token', jwt);
+    localStorage.setItem('username', user);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('activeTab');
     setToken(null);
     setUsername('');
   };
