@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { HabitRecommendation } from '../types';
-import { Sparkles, Clock, RefreshCw, Quote } from 'lucide-react';
+import { Sparkles, Clock, RefreshCw, Quote, AlertTriangle, Trash2 } from 'lucide-react';
 
 export const Insights: React.FC = () => {
   const [recommendations, setRecommendations] = useState<HabitRecommendation[]>([]);
@@ -24,6 +24,22 @@ export const Insights: React.FC = () => {
   useEffect(() => {
     fetchRecommendations();
   }, []);
+
+  const handleDelete = (id: number) => {
+    setRecommendations((prev) => prev.filter((rec) => rec.id !== id));
+  };
+
+  const isErrorRecommendation = (text: string) => {
+    const lower = text.toLowerCase();
+    return (
+      lower.includes('ошибка') ||
+      lower.includes('error') ||
+      lower.includes('400') ||
+      lower.includes('failed') ||
+      lower.includes('не удалось') ||
+      lower.includes('недоступен')
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
@@ -58,37 +74,69 @@ export const Insights: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          {recommendations.map((rec) => (
-            <div key={rec.id} className="bg-card border border-border rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center justify-between text-xs text-zinc-500 mb-4 pb-3 border-b border-border">
-                <div className="flex items-center space-x-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{new Date(rec.createdAt).toLocaleString()}</span>
-                </div>
-                {rec.aiResponseDurationMs && (
-                  <span className="bg-zinc-900 px-2.5 py-1 rounded-lg border border-border text-zinc-400">
-                    AI отдал ответ за {rec.aiResponseDurationMs} мс
-                  </span>
-                )}
-              </div>
+          {recommendations.map((rec) => {
+            const hasError = isErrorRecommendation(rec.recommendationText);
+            return (
+              <div
+                key={rec.id}
+                className={`bg-card border rounded-2xl p-6 shadow-xl transition-all ${
+                  hasError ? 'border-red-500/40 bg-red-950/10' : 'border-border'
+                }`}
+              >
+                <div className="flex items-center justify-between text-xs text-zinc-500 mb-4 pb-3 border-b border-border">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1.5">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{new Date(rec.createdAt).toLocaleString()}</span>
+                    </div>
+                    {hasError && (
+                      <span className="flex items-center space-x-1 px-2 py-0.5 bg-red-500/10 border border-red-500/20 text-red-400 rounded-md font-medium">
+                        <AlertTriangle className="w-3 h-3" />
+                        <span>Ошибка ИИ</span>
+                      </span>
+                    )}
+                  </div>
 
-              <div className="mb-4 bg-zinc-900/50 border border-border/60 rounded-xl p-4 relative">
-                <Quote className="w-4 h-4 text-zinc-600 absolute top-3 right-3" />
-                <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider block mb-1">Ваш отчёт</span>
-                <p className="text-zinc-300 text-sm italic">"{rec.userInput}"</p>
-              </div>
+                  <div className="flex items-center space-x-3">
+                    {rec.aiResponseDurationMs && !hasError && (
+                      <span className="bg-zinc-900 px-2.5 py-1 rounded-lg border border-border text-zinc-400">
+                        AI отдал ответ за {rec.aiResponseDurationMs} мс
+                      </span>
+                    )}
+                    <button
+                      onClick={() => handleDelete(rec.id)}
+                      className="text-zinc-500 hover:text-red-400 transition-colors p-1"
+                      title="Удалить запись"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-indigo-400">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Совет AI-коуча</span>
+                <div className="mb-4 bg-zinc-900/50 border border-border/60 rounded-xl p-4 relative">
+                  <Quote className="w-4 h-4 text-zinc-600 absolute top-3 right-3" />
+                  <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider block mb-1">Ваш отчёт</span>
+                  <p className="text-zinc-300 text-sm italic">"{rec.userInput}"</p>
                 </div>
-                <div className="text-zinc-200 text-sm whitespace-pre-line leading-relaxed bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4">
-                  {rec.recommendationText}
+
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-indigo-400">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-xs font-semibold uppercase tracking-wider">Совет AI-коуча</span>
+                  </div>
+                  <div
+                    className={`text-sm whitespace-pre-line leading-relaxed rounded-xl p-4 border ${
+                      hasError
+                        ? 'bg-red-950/20 border-red-500/30 text-red-200'
+                        : 'bg-indigo-950/20 border-indigo-500/20 text-zinc-200'
+                    }`}
+                  >
+                    {rec.recommendationText}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
