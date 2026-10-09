@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import api, { deleteRecommendation } from '../services/api';
 import { HabitRecommendation } from '../types';
 import { Sparkles, Clock, RefreshCw, Quote, AlertTriangle, Trash2 } from 'lucide-react';
 
@@ -25,8 +25,17 @@ export const Insights: React.FC = () => {
     fetchRecommendations();
   }, []);
 
-  const handleDelete = (id: number) => {
-    setRecommendations((prev) => prev.filter((rec) => rec.id !== id));
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить эту рекомендацию? Данные удалятся безвозвратно.')) {
+      return;
+    }
+    setError('');
+    try {
+      await deleteRecommendation(id);
+      setRecommendations((prev) => prev.filter((rec) => rec.id !== id));
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Не удалось удалить рекомендацию');
+    }
   };
 
   const isErrorRecommendation = (text: string) => {
@@ -75,7 +84,7 @@ export const Insights: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {recommendations.map((rec) => {
-            const hasError = isErrorRecommendation(rec.recommendationText);
+            const hasError = isErrorRecommendation(rec.recommendationText) || rec.hasError;
             return (
               <div
                 key={rec.id}

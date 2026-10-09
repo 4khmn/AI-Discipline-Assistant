@@ -2,6 +2,7 @@ package akhm.project.habit.client;
 
 import akhm.project.habit.dto.HabitRecommendationResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -12,4 +13,7 @@ public interface AnalyticsClient {
 
     @GetMapping("/api/ai/recommendations/user/{userId}")
     List<HabitRecommendationResponse> getRecommendationsByUserId(@PathVariable("userId") Long userId);
+
+    @DeleteMapping("/api/ai/recommendations/{id}")
+    void deleteRecommendation(@PathVariable("id") Long id);
 }

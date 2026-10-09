@@ -23,4 +23,11 @@ public class AiAnalyticsController {
         List<HabitRecommendationResponse> responseList = aiAnalysisService.getRecommendationsByUserId(userId);
         return ResponseEntity.ok(responseList);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id) {
+        log.info("Received request to delete recommendation with id: {}", id);
+        aiAnalysisService.deleteRecommendation(id);
+        return ResponseEntity.noContent().build();
+    }
 }

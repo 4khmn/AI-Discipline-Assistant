@@ -79,4 +79,13 @@ public class AiAnalysisService {
         log.info("Found {} recommendations for user id: {}", responseList.size(), userId);
         return responseList;
     }
+
+    public void deleteRecommendation(Long id) {
+        log.info("Deleting recommendation with id: {}", id);
+        if (!recommendationRepository.existsById(id)) {
+            throw new RuntimeException("Recommendation not found with id: " + id);
+        }
+        recommendationRepository.deleteById(id);
+        log.info("Successfully deleted recommendation with id: {}", id);
+    }
 }

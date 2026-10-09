@@ -69,4 +69,12 @@ public class HabitController {
         log.info("Successfully fetched {} AI recommendations for user id: {}", recommendations.size(), user.getId());
         return ResponseEntity.ok(recommendations);
     }
+
+    @DeleteMapping("/recommendations/{id}")
+    public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id, Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "unknown";
+        log.info("Received request to delete recommendation id: {} for user: {}", id, username);
+        habitService.deleteRecommendation(id, authentication);
+        return ResponseEntity.noContent().build();
+    }
 }

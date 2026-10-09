@@ -1,5 +1,6 @@
 package akhm.project.habit.service;
 
+import akhm.project.habit.client.AnalyticsClient;
 import akhm.project.habit.dto.DisciplineReportRequest;
 import akhm.project.habit.dto.HabitReportMessage;
 import akhm.project.habit.dto.HabitReportRequest;
@@ -24,6 +25,7 @@ public class HabitService {
 
     private final KafkaProducerService kafkaProducerService;
     private final UserDailyDisciplineRepository disciplineRepository;
+    private final AnalyticsClient analyticsClient;
 
     public void submitHabitReport(HabitReportRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -69,6 +71,12 @@ public class HabitService {
         User user = (User) authentication.getPrincipal();
         log.info("Fetching discipline history for user id: {}", user.getId());
         return disciplineRepository.findByUserIdOrderByDisciplineDateDesc(user.getId());
+    }
+
+    public void deleteRecommendation(Long id, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        log.info("Deleting recommendation id: {} for user id: {}", id, user.getId());
+        analyticsClient.deleteRecommendation(id);
     }
 
 }

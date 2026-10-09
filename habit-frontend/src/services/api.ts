@@ -28,4 +28,8 @@ export const fetchDisciplines = async (): Promise<UserDailyDiscipline[]> => {
   return response.data;
 };
 
+export const deleteRecommendation = async (id: number) => {
+  await api.delete(`/api/habits/recommendations/${id}`);
+};
+
 export default api;
