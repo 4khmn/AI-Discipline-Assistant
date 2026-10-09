@@ -1,5 +1,6 @@
 package akhm.project.habit.service;
 
+import akhm.project.habit.dto.DisciplineReportRequest;
 import akhm.project.habit.dto.HabitReportMessage;
 import akhm.project.habit.dto.HabitReportRequest;
 import akhm.project.habit.entity.User;
@@ -29,6 +30,12 @@ public class HabitService {
 
         kafkaProducerService.sendHabitReport(message);
         log.info("Habit report sent to kafka for user id: {}", user.getId());
+    }
+
+    public void submitDisciplineReport(DisciplineReportRequest request, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        log.info("Submitting discipline report for user id: {}, disciplines: {}", user.getId(), request.disciplines());
+        // Business logic for saving or processing daily disciplines can be added here
     }
 
 }

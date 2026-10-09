@@ -1,6 +1,7 @@
 package akhm.project.habit.controller;
 
 import akhm.project.habit.client.AnalyticsClient;
+import akhm.project.habit.dto.DisciplineReportRequest;
 import akhm.project.habit.dto.HabitRecommendationResponse;
 import akhm.project.habit.dto.HabitReportRequest;
 import akhm.project.habit.entity.User;
@@ -35,6 +36,19 @@ public class HabitController {
         return ResponseEntity.accepted().body(Map.of(
                 "status", "ACCEPTED",
                 "message", "Отчет принят и отправлен на AI-анализ"
+        ));
+    }
+
+    @PostMapping("/disciplines")
+    public ResponseEntity<Map<String, String>> submitDisciplines(
+            @RequestBody DisciplineReportRequest request,
+            Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : "unknown";
+        log.info("Received discipline report for user: {}", username);
+        habitService.submitDisciplineReport(request, authentication);
+        return ResponseEntity.ok(Map.of(
+                "status", "SUCCESS",
+                "message", "Дисциплина успешно сохранена"
         ));
     }
 
