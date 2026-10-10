@@ -1,7 +1,11 @@
 package akhm.project.ai.service;
 
+import akhm.project.ai.dto.AiSummaryResponse;
 import akhm.project.ai.dto.HabitRecommendationResponse;
+import akhm.project.ai.entity.AiSummary;
 import akhm.project.ai.entity.HabitRecommendation;
+import akhm.project.ai.mapper.AiSummaryMapper;
+import akhm.project.ai.repository.AiSummaryRepository;
 import akhm.project.ai.repository.HabitRecommendationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +25,8 @@ public class AiAnalysisService {
 
     private final ChatModel chatModel;
     private final HabitRecommendationRepository recommendationRepository;
+    private final AiSummaryRepository aiSummaryRepository;
+    private final AiSummaryMapper mapper;
 
     public record AiAnalysisResult(String text, boolean hasError) {}
 
@@ -87,5 +93,17 @@ public class AiAnalysisService {
         }
         recommendationRepository.deleteById(id);
         log.info("Successfully deleted recommendation with id: {}", id);
+    }
+
+    public AiSummaryResponse getAiSummaryByUserId(long userId) {
+        AiSummary byUserId = aiSummaryRepository.findByUserId(userId);
+        return mapper.toDto(byUserId);
+    }
+
+    public void updateSummary(HabitRecommendation recommendation){
+        if (aiSummaryRepository.existsByUserId(recommendation.getUserId())) {
+            AiSummary summary = aiSummaryRepository.findByUserId(recommendation.getUserId());
+            // просматриваем все рекомендации, и склеиваем итоговый самари .
+
     }
 }
