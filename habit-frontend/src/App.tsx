@@ -3,12 +3,13 @@ import { Auth } from './components/Auth';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { Insights } from './components/Insights';
+import { Charts } from './components/Charts';
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [username, setUsername] = useState<string>(localStorage.getItem('username') || '');
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'insights'>(() => {
-    return (localStorage.getItem('activeTab') as 'dashboard' | 'insights') || 'dashboard';
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'insights' | 'charts'>(() => {
+    return (localStorage.getItem('activeTab') as 'dashboard' | 'insights' | 'charts') || 'dashboard';
   });
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-zinc-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -43,7 +44,9 @@ export default function App() {
         username={username}
       />
       <main className="flex-1">
-        {activeTab === 'dashboard' ? <Dashboard /> : <Insights />}
+        {activeTab === 'dashboard' && <Dashboard />}
+        {activeTab === 'charts' && <Charts />}
+        {activeTab === 'insights' && <Insights />}
       </main>
     </div>
   );
