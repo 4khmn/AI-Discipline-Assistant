@@ -103,7 +103,26 @@ public class AiAnalysisService {
     public void updateSummary(HabitRecommendation recommendation){
         if (aiSummaryRepository.existsByUserId(recommendation.getUserId())) {
             AiSummary summary = aiSummaryRepository.findByUserId(recommendation.getUserId());
-            // просматриваем все рекомендации, и склеиваем итоговый самари .
+            String template = """
+                Ты — профессиональный AI-коуч по формированию полезных привычек.
+                Ниже приведены предыдущие рекомендации и отчеты пользователя:
+                {recommendations}
+                
+                Составь краткое итоговое резюме (summary) прогресса пользователя, выделив его сильные стороны и зоны роста на русском языке.
+                """;
+
+            List<HabitRecommendation> recommendationsByUser = recommendationRepository
+                    .findByUserIdOrderByCreatedAtDesc(recommendation.getUserId());
+            PromptTemplate promptTemplate = new PromptTemplate(template);
+            Prompt prompt = promptTemplate.create(Map.of("recommendations", recommendationsByUser));
+
+            try {
+                String response = chatModel.call(prompt).getResult().getOutput().getText();
+                log.info("Успешно получен ответ от Gemini!");
+            } catch (Exception e) {
+                log.error("Ошибка при запросе к Gemini API: {}", e.getMessage(), e);
+
+            }
 
     }
 }
