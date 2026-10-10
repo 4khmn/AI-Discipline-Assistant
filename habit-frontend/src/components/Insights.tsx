@@ -64,6 +64,12 @@ export const Insights: React.FC = () => {
   const totalAnalyzed = summary?.totalAnalyzed || 0;
   const reportsNeeded = Math.max(0, 3 - totalAnalyzed);
 
+  const getReportWord = (count: number) => {
+    if (count === 1) return 'отчёт';
+    if (count >= 2 && count <= 4) return 'отчёта';
+    return 'отчётов';
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 font-sans">
       <div className="flex items-center justify-between mb-8">
@@ -114,7 +120,7 @@ export const Insights: React.FC = () => {
               <span>Итоговое резюме AI-коуча</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Сделайте еще {reportsNeeded} {reportsNeeded === 1 ? отчёт : reportsNeeded < 5 ? отчёта : отчётов} для получения итогового самари (проанализировано: {totalAnalyzed}/3).
+              Сделайте еще {reportsNeeded} {getReportWord(reportsNeeded)} для получения итогового самари (проанализировано: {totalAnalyzed}/3).
             </p>
           </div>
         )}
