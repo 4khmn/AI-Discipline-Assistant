@@ -1,29 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import api, { deleteRecommendation } from '../services/api';
 import { HabitRecommendation } from '../types';
-import { Sparkles, Clock, RefreshCw, Quote, AlertTriangle, Trash2, X } from 'lucide-react';
+import { Sparkles, Clock, RefreshCw, Quote, AlertTriangle, Trash2, X, Award } from 'lucide-react';
+
+interface AiSummary {
+  summaryText: string;
+  totalAnalyzed: number;
+}
 
 export const Insights: React.FC = () => {
   const [recommendations, setRecommendations] = useState<HabitRecommendation[]>([]);
+  const [summary, setSummary] = useState<AiSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deleteModalId, setDeleteModalId] = useState<number | null>(null);
 
-  const fetchRecommendations = async () => {
+  const fetchData = async () => {
     setLoading(true);
     setError('');
     try {
-      const response = await api.get<HabitRecommendation[]>('/api/habits/recommendations');
-      setRecommendations(response.data);
+      const [recResponse, summaryResponse] = await Promise.all([
+        api.get<HabitRecommendation[]>('/api/habits/recommendations'),
+        api.get<AiSummary>('/api/habits/summary').catch(() => ({ data: null }))
+      ]);
+      setRecommendations(recResponse.data);
+      setSummary(summaryResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Не удалось загрузить рекомендации');
+      setError(err.response?.data?.message || 'Не удалось загрузить данные');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRecommendations();
+    fetchData();
   }, []);
 
   const confirmDelete = async () => {
@@ -51,6 +61,9 @@ export const Insights: React.FC = () => {
     );
   };
 
+  const totalAnalyzed = summary?.totalAnalyzed || 0;
+  const reportsNeeded = Math.max(0, 3 - totalAnalyzed);
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 font-sans">
       <div className="flex items-center justify-between mb-8">
@@ -59,7 +72,7 @@ export const Insights: React.FC = () => {
           <p className="text-xs text-slate-400 mt-1">Персональные рекомендации вашего AI-коуча</p>
         </div>
         <button
-          onClick={fetchRecommendations}
+          onClick={fetchData}
           disabled={loading}
           className="flex items-center space-x-2 px-3.5 py-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-lg text-xs font-medium text-slate-300 transition-colors disabled:opacity-50"
         >
@@ -73,6 +86,39 @@ export const Insights: React.FC = () => {
           {error}
         </div>
       )}
+
+      {/* AI Summary Section */}
+      <div className="mb-6">
+        {totalAnalyzed >= 3 && summary?.summaryText ? (
+          <div className="bg-gradient-to-br from-indigo-950/40 via-slate-900/80 to-slate-900/90 border border-indigo-500/30 rounded-xl p-5 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="flex items-center justify-between text-[11px] text-indigo-300/80 mb-3 pb-2.5 border-b border-indigo-500/20">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 px-2 py-0.5 bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 rounded font-medium">
+                  <Award className="w-3.5 h-3.5" />
+                  <span>Общая рекомендация (Итоговое резюме)</span>
+                </div>
+              </div>
+              <span className="text-slate-400">Проанализировано отчетов: {totalAnalyzed}</span>
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-xs whitespace-pre-line leading-relaxed text-slate-200">
+                {summary.summaryText}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 text-center text-slate-400 text-xs">
+            <div className="flex items-center justify-center space-x-1.5 mb-1 text-indigo-400 font-medium">
+              <Award className="w-4 h-4" />
+              <span>Итоговое резюме AI-коуча</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Сделайте еще {reportsNeeded} {reportsNeeded === 1 ? отчёт : reportsNeeded < 5 ? отчёта : отчётов} для получения итогового самари (проанализировано: {totalAnalyzed}/3).
+            </p>
+          </div>
+        )}
+      </div>
 
       {loading && recommendations.length === 0 ? (
         <div className="text-center py-12 text-slate-500 text-xs">Загрузка рекомендаций...</div>
