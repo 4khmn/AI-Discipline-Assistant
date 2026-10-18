@@ -15,8 +15,8 @@ public class KafkaProducerService {
     private static final String HABIT_REPORT_TOPIC = "habit-events";
 
     public void sendHabitReport(HabitReportMessage message) {
-        log.info("Sending habit report message for user id: {} to Kafka topic: {}", message.getUserId(), HABIT_REPORT_TOPIC);
+        log.info("Sending habit report message for user id: {} to Kafka topic: {}", message.userId(), HABIT_REPORT_TOPIC);
         kafkaTemplate.send(HABIT_REPORT_TOPIC, message);
-        log.info("Successfully sent habit report message for user id: {} to Kafka topic: {}", message.getUserId(), HABIT_REPORT_TOPIC);
+        log.info("Successfully sent habit report message for user id: {} to Kafka topic: {}", message.userId(), HABIT_REPORT_TOPIC);
     }
 }

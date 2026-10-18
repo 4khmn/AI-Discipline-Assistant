@@ -1,0 +1,21 @@
+# Настраиваем глобальные параметры сбора метрик
+global:
+  # Запрашиваем метрики каждые 15 секунд
+  scrape_interval: 15s
+
+# Описываем приложения, у которых собираем метрики
+scrape_configs:
+
+  # Первый микросервис
+  - job_name: "habit-api-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      # Имя Compose-сервиса и внутренний порт контейнера
+      - targets: ["habit-api-service:8080"]
+
+  # Второй микросервис
+  - job_name: "ai-analytics-service"
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      # Имя Compose-сервиса и внутренний порт контейнера
+      - targets: ["ai-analytics-service:8081"]
