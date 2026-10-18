@@ -1,9 +1,7 @@
 package akhm.project.ai.listener;
 
 import akhm.project.ai.dto.HabitReportMessage;
-import akhm.project.ai.entity.AiSummary;
 import akhm.project.ai.entity.HabitRecommendation;
-import akhm.project.ai.repository.AiSummaryRepository;
 import akhm.project.ai.repository.HabitRecommendationRepository;
 import akhm.project.ai.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +33,11 @@ public class HabitEventListener {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset
     ) {
-        log.info("Received Kafka message from topic: {}, partition: {}, offset: {}, key: {}", 
-                record.topic(), partition, offset, record.key());
+        log.info("Start processing message with key: {}, offset: {}", record.key(), offset);
 
         try {
             processEvent(record.key(), message);
-            log.info("Successfully processed message with key: {}", record.key());
+            log.info("Finished processing message with key: {}, offset: {}", record.key(), offset);
         } catch (Exception e) {
             log.error("Error processing Kafka message from topic {} at offset {}: {}",
                     record.topic(), offset, e.getMessage(), e);
@@ -53,8 +50,6 @@ public class HabitEventListener {
         AiAnalysisService.AiAnalysisResult result = aiAnalysisService.analyzeHabitData(message.getReportText());
         long durationMs = System.currentTimeMillis() - startTime;
 
-        log.info("AI analysis completed for report key: {}, duration: {} ms, hasError: {}", key, durationMs, result.hasError());
-
         HabitRecommendation recommendation = HabitRecommendation.builder()
                 .userId(message.getUserId() != null ? message.getUserId() : 1L)
                 .userInput(message.getReportText())
@@ -66,7 +61,5 @@ public class HabitEventListener {
 
         recommendationRepository.save(recommendation);
         aiAnalysisService.updateSummary(recommendation);
-
-        log.info("Saved AI recommendation to database for user id: {}", message.getUserId());
     }
 }

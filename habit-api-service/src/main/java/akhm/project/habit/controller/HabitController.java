@@ -1,7 +1,6 @@
 package akhm.project.habit.controller;
 
 import akhm.project.habit.client.AnalyticsClient;
-import akhm.project.habit.dto.AiSummaryResponse;
 import akhm.project.habit.dto.DisciplineReportRequest;
 import akhm.project.habit.dto.HabitRecommendationResponse;
 import akhm.project.habit.dto.HabitReportRequest;
@@ -70,12 +69,6 @@ public class HabitController {
         log.info("Successfully fetched {} AI recommendations for user id: {}", recommendations.size(), user.getId());
         return ResponseEntity.ok(recommendations);
     }
-
-//    @GetMapping("/recommendations/summary")
-//    public ResponseEntity<AiSummaryResponse> getSummary(Authentication authentication) {
-//        User user = (User) authentication.getPrincipal();
-//        log.info("");
-//    }
 
     @DeleteMapping("/recommendations/{id}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id, Authentication authentication) {

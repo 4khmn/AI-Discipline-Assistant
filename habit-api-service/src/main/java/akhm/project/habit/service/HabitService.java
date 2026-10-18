@@ -9,7 +9,6 @@ import akhm.project.habit.entity.UserDailyDiscipline;
 import akhm.project.habit.enums.Discipline;
 import akhm.project.habit.repository.UserDailyDisciplineRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HabitService {
@@ -29,7 +27,6 @@ public class HabitService {
 
     public void submitHabitReport(HabitReportRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        log.info("Submitting habit report for user id: {}", user.getId());
 
         HabitReportMessage message = new HabitReportMessage(
                 user.getId(),
@@ -38,13 +35,11 @@ public class HabitService {
         );
 
         kafkaProducerService.sendHabitReport(message);
-        log.info("Habit report sent to kafka for user id: {}", user.getId());
     }
 
     public void submitDisciplineReport(DisciplineReportRequest request, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         LocalDate targetDate = request.date() != null ? request.date() : LocalDate.now();
-        log.info("Submitting discipline report for user id: {}, date: {}, disciplines: {}", user.getId(), targetDate, request.disciplines());
 
         UserDailyDiscipline dailyDiscipline = disciplineRepository
                 .findByUserIdAndDisciplineDate(user.getId(), targetDate)
@@ -64,18 +59,14 @@ public class HabitService {
         }
 
         disciplineRepository.save(dailyDiscipline);
-        log.info("Discipline report successfully saved for user id: {}, date: {}", user.getId(), targetDate);
     }
 
     public List<UserDailyDiscipline> getDisciplinesHistory(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        log.info("Fetching discipline history for user id: {}", user.getId());
         return disciplineRepository.findByUserIdOrderByDisciplineDateDesc(user.getId());
     }
 
     public void deleteRecommendation(Long id, Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        log.info("Deleting recommendation id: {} for user id: {}", id, user.getId());
         analyticsClient.deleteRecommendation(id);
     }
 

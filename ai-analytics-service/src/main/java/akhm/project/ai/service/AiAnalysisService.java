@@ -8,7 +8,6 @@ import akhm.project.ai.mapper.AiSummaryMapper;
 import akhm.project.ai.repository.AiSummaryRepository;
 import akhm.project.ai.repository.HabitRecommendationRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AiAnalysisService {
@@ -31,8 +29,6 @@ public class AiAnalysisService {
     public record AiAnalysisResult(String text, boolean hasError) {}
 
     public AiAnalysisResult analyzeHabitData(String habitPayload) {
-        log.info("Отправка данных трекинга в Gemini через Spring AI...");
-
         String template = """
                 Ты — профессиональный AI-коуч по формированию полезных привычек и самодисциплине.
                 
@@ -57,19 +53,16 @@ public class AiAnalysisService {
 
         try {
             String response = chatModel.call(prompt).getResult().getOutput().getText();
-            log.info("Успешно получен ответ от Gemini!");
             return new AiAnalysisResult(response, false);
         } catch (Exception e) {
-            log.error("Ошибка при запросе к Gemini API: {}", e.getMessage(), e);
             return new AiAnalysisResult("В данный момент ИИ-коуч временно недоступен или отклонил запрос. Пожалуйста, попробуйте позже.", true);
         }
     }
 
     public List<HabitRecommendationResponse> getRecommendationsByUserId(Long userId) {
-        log.info("Fetching recommendations for user id: {}", userId);
         List<HabitRecommendation> recommendations = recommendationRepository.findByUserIdOrderByCreatedAtDesc(userId);
 
-        List<HabitRecommendationResponse> responseList = recommendations.stream()
+        return recommendations.stream()
                 .map(rec -> HabitRecommendationResponse.builder()
                         .id(rec.getId())
                         .userId(rec.getUserId())
@@ -81,18 +74,13 @@ public class AiAnalysisService {
                         .createdAt(rec.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
-
-        log.info("Found {} recommendations for user id: {}", responseList.size(), userId);
-        return responseList;
     }
 
     public void deleteRecommendation(Long id) {
-        log.info("Deleting recommendation with id: {}", id);
         if (!recommendationRepository.existsById(id)) {
             throw new RuntimeException("Recommendation not found with id: " + id);
         }
         recommendationRepository.deleteById(id);
-        log.info("Successfully deleted recommendation with id: {}", id);
     }
 
     public AiSummaryResponse getAiSummaryByUserId(long userId) {
@@ -121,9 +109,7 @@ public class AiAnalysisService {
                 summary.setSummaryText(response);
                 summary.setTotalAnalyzed(summary.getTotalAnalyzed()+1);
                 aiSummaryRepository.save(summary);
-                log.info("Успешно получен ответ от Gemini!");
-            } catch (Exception e) {
-                log.error("Ошибка при запросе к Gemini API: {}", e.getMessage(), e);
+            } catch (Exception ignored) {
             }
         }
         aiSummaryRepository.save(
@@ -132,6 +118,5 @@ public class AiAnalysisService {
                         .summaryText(recommendation.getRecommendationText())
                         .totalAnalyzed(1)
                         .build());
-
     }
 }
