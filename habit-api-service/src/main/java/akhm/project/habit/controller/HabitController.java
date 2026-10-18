@@ -47,23 +47,19 @@ public class HabitController {
         String username = authentication != null ? authentication.getName() : "unknown";
         log.info("Received discipline report for user: {}", username);
         habitService.submitDisciplineReport(request, authentication);
+        log.info("Successfully submitted discipline report for user: {}", username);
         return ResponseEntity.ok(Map.of(
                 "status", "SUCCESS",
                 "message", "Дисциплина успешно сохранена"
         ));
     }
 
-//        @GetMapping("/recommendations/summary")
-//                public ResponseEntity<AiSummaryResponse> getSummary(Authentication authentication) {
-//                    User user = (User) authentication.getPrincipal();
-//                    log.info("");
-//        }
-
     @GetMapping("/disciplines")
     public ResponseEntity<List<UserDailyDiscipline>> getDisciplines(Authentication authentication) {
         String username = authentication != null ? authentication.getName() : "unknown";
         log.info("Received request to fetch disciplines history for user: {}", username);
         List<UserDailyDiscipline> history = habitService.getDisciplinesHistory(authentication);
+        log.info("Successfully fetched disciplines history for user: {}", username);
         return ResponseEntity.ok(history);
     }
 
@@ -81,6 +77,7 @@ public class HabitController {
         String username = authentication != null ? authentication.getName() : "unknown";
         log.info("Received request to delete recommendation id: {} for user: {}", id, username);
         habitService.deleteRecommendation(id, authentication);
+        log.info("Successfully deleted recommendation id: {} for user: {}", id, username);
         return ResponseEntity.noContent().build();
     }
 }

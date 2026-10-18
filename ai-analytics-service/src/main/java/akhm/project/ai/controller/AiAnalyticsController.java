@@ -22,6 +22,7 @@ public class AiAnalyticsController {
     public ResponseEntity<List<HabitRecommendationResponse>> getRecommendationsByUserId(@PathVariable Long userId) {
         log.info("Received request to fetch recommendations for user id: {}", userId);
         List<HabitRecommendationResponse> responseList = aiAnalysisService.getRecommendationsByUserId(userId);
+        log.info("Successfully fetched recommendations for user id: {}", userId);
         return ResponseEntity.ok(responseList);
     }
 
@@ -29,6 +30,7 @@ public class AiAnalyticsController {
     public ResponseEntity<AiSummaryResponse> getAiSummaryByUserId(@PathVariable Long userId) {
         log.info("Received request to fetch ai summary for user id: {}", userId);
         AiSummaryResponse aiSummaryResponse = aiAnalysisService.getAiSummaryByUserId(userId);
+        log.info("Successfully fetched ai summary for user id: {}", userId);
         return ResponseEntity.ok(aiSummaryResponse);
     }
 
@@ -37,6 +39,7 @@ public class AiAnalyticsController {
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id) {
         log.info("Received request to delete recommendation with id: {}", id);
         aiAnalysisService.deleteRecommendation(id);
+        log.info("Successfully deleted recommendation with id: {}", id);
         return ResponseEntity.noContent().build();
     }
 }
