@@ -1,5 +1,6 @@
 package akhm.project.ai.controller;
 
+import akhm.project.ai.dto.AiSummaryResponse;
 import akhm.project.ai.dto.HabitRecommendationResponse;
 import akhm.project.ai.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,14 @@ public class AiAnalyticsController {
         List<HabitRecommendationResponse> responseList = aiAnalysisService.getRecommendationsByUserId(userId);
         return ResponseEntity.ok(responseList);
     }
+
+    @GetMapping("/summary/user/{userId}")
+    public ResponseEntity<AiSummaryResponse> getAiSummaryByUserId(@PathVariable Long userId) {
+        log.info("Received request to fetch ai summary for user id: {}", userId);
+        AiSummaryResponse aiSummaryResponse = aiAnalysisService.getAiSummaryByUserId(userId);
+        return ResponseEntity.ok(aiSummaryResponse);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecommendation(@PathVariable Long id) {

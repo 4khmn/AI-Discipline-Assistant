@@ -1,7 +1,9 @@
 package akhm.project.ai.listener;
 
 import akhm.project.ai.dto.HabitReportMessage;
+import akhm.project.ai.entity.AiSummary;
 import akhm.project.ai.entity.HabitRecommendation;
+import akhm.project.ai.repository.AiSummaryRepository;
 import akhm.project.ai.repository.HabitRecommendationRepository;
 import akhm.project.ai.service.AiAnalysisService;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +65,8 @@ public class HabitEventListener {
                 .build();
 
         recommendationRepository.save(recommendation);
+        aiAnalysisService.updateSummary(recommendation);
+
         log.info("Saved AI recommendation to database for user id: {}", message.getUserId());
     }
 }

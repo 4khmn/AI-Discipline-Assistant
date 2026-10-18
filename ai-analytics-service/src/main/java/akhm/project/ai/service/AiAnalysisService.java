@@ -104,12 +104,12 @@ public class AiAnalysisService {
         if (aiSummaryRepository.existsByUserId(recommendation.getUserId())) {
             AiSummary summary = aiSummaryRepository.findByUserId(recommendation.getUserId());
             String template = """
-                Ты — профессиональный AI-коуч по формированию полезных привычек.
-                Ниже приведены предыдущие рекомендации и отчеты пользователя:
-                {recommendations}
-                
-                Составь краткое итоговое резюме (summary) прогресса пользователя, выделив его сильные стороны и зоны роста на русском языке.
-                """;
+                    Ты — профессиональный AI-коуч по формированию полезных привычек.
+                    Ниже приведены предыдущие рекомендации и отчеты пользователя:
+                    {recommendations}
+                    
+                    Составь краткое итоговое резюме (summary) прогресса пользователя, выделив его сильные стороны и зоны роста на русском языке.
+                    """;
 
             List<HabitRecommendation> recommendationsByUser = recommendationRepository
                     .findByUserIdOrderByCreatedAtDesc(recommendation.getUserId());
@@ -118,11 +118,20 @@ public class AiAnalysisService {
 
             try {
                 String response = chatModel.call(prompt).getResult().getOutput().getText();
+                summary.setSummaryText(response);
+                summary.setTotalAnalyzed(summary.getTotalAnalyzed()+1);
+                aiSummaryRepository.save(summary);
                 log.info("Успешно получен ответ от Gemini!");
             } catch (Exception e) {
                 log.error("Ошибка при запросе к Gemini API: {}", e.getMessage(), e);
-
             }
+        }
+        aiSummaryRepository.save(
+                AiSummary.builder()
+                        .userId(recommendation.getUserId())
+                        .summaryText(recommendation.getRecommendationText())
+                        .totalAnalyzed(1)
+                        .build());
 
     }
 }
