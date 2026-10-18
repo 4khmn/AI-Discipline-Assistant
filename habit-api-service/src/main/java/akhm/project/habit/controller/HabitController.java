@@ -53,6 +53,12 @@ public class HabitController {
         ));
     }
 
+//        @GetMapping("/recommendations/summary")
+//                public ResponseEntity<AiSummaryResponse> getSummary(Authentication authentication) {
+//                    User user = (User) authentication.getPrincipal();
+//                    log.info("");
+//        }
+
     @GetMapping("/disciplines")
     public ResponseEntity<List<UserDailyDiscipline>> getDisciplines(Authentication authentication) {
         String username = authentication != null ? authentication.getName() : "unknown";
