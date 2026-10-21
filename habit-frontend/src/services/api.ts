@@ -18,6 +18,17 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+    }
+    console.error('API Error:', error.response || error.message);
+    return Promise.reject(error);
+  }
+);
+
 export const saveDisciplines = async (date: string, disciplines: Record<DisciplineKey, boolean>) => {
   const response = await api.post('/api/habits/disciplines', { date, disciplines });
   return response.data;
